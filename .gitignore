@@ -1,0 +1,14 @@
+# Dart tooling
+.dart_tool/
+.packages
+build/
+
+# Coverage and benchmark scratch output
+/coverage/
+/bench/out/
+
+# IDEs
+/.vs/
+/.vscode/
+/.idea/
+*.iml

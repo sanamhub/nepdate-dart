@@ -1,0 +1,19 @@
+name: nepdate_workspace
+description: Workspace root for the NepDate Dart packages. Not published.
+publish_to: none
+
+environment:
+  sdk: ^3.6.0
+
+workspace:
+  - packages/nepdate
+  - packages/nepdate_patro
+
+dev_dependencies:
+  coverage: 1.15.1
+  lints: 5.1.1
+
+# Newer releases of these two transitive dev packages were under 14 days old when the lock was made.
+dependency_overrides:
+  crypto: 3.0.7
+  http_multi_server: 3.2.2
