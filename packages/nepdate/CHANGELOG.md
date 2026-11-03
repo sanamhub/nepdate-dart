@@ -6,6 +6,8 @@ changelog has the full history.
 
 ## [Unreleased]
 
+## 0.2.0-rc.1
+
 ### Added
 
 - Bikram Sambat dates from 1901-01-01 to 2199-12-30 with conversion to and from Gregorian, the

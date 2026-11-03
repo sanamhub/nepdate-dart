@@ -6,6 +6,8 @@ changelog has the full history.
 
 ## [Unreleased]
 
+## 0.2.0-rc.1
+
 ### Added
 
 - Tithi, public holidays and events for BS 2077-01-01 to 2084-08-20, compiled into constant tables.
