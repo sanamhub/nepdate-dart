@@ -8,6 +8,8 @@ repository joins at `0.2.0-rc.1` with the other ports
 
 ## [Unreleased]
 
+## 0.2.0-rc.1
+
 ### Added
 
 - The `nepdate` package: Bikram Sambat dates from 1901-01-01 to 2199-12-30 with conversion to and
