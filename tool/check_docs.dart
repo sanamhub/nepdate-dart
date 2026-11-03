@@ -270,7 +270,7 @@ void _prose() {
     'CHANGELOG.md',
     'CONTRIBUTING.md',
     'SECURITY.md',
-    'AGENTS.md',
+    'CODE_OF_CONDUCT.md',
   ];
   final docsDir = Directory('docs');
   if (docsDir.existsSync()) {
