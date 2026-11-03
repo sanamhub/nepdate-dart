@@ -1,0 +1,8 @@
+{
+  "tool": "mutation_test 1.7.1",
+  "configuration": "mutation.xml",
+  "failure_percent": 50,
+  "measured_percent": null,
+  "measured_on": null,
+  "note": "Run the mutation workflow once on a quiet machine and record the score here. The threshold in mutation.xml is the gate; this file is the record of the measured floor and the date it was read."
+}
