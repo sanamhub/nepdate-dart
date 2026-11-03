@@ -32,7 +32,7 @@ Two pub.dev packages, released together with the same version and one tag:
 Pure Dart, so it runs on the VM, in Flutter on every platform and on the web. There is no time zone
 database: `today` takes a zone name or a fixed offset, or a clock you inject, so it never reads a
 hidden local zone. BS 1901-01-01 to 2199-12-30 (AD 1844-04-11 to 2143-04-15), with the same results
-as C# NepDate and the other ports, proved by the shared vectors.
+as C# NepDate and the other ports, checked against the shared vectors.
 
 ## Install
 
