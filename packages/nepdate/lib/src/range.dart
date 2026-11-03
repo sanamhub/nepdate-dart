@@ -73,13 +73,13 @@ final class NepaliDateRange extends IterableBase<NepaliDate> {
   /// The month that contains today in [timeZone]. The zones are those of [NepaliDate.today].
   ///
   /// ```dart
-  /// NepaliDateRange.currentMonth('UTC', clock: () => DateTime.utc(2024, 7, 30)).toString();
+  /// NepaliDateRange.currentMonth(timeZone: 'UTC', clock: () => DateTime.utc(2024, 7, 30)).toString();
   /// // => 2081/04/01 - 2081/04/32
   /// ```
-  factory NepaliDateRange.currentMonth([
+  factory NepaliDateRange.currentMonth({
     String timeZone = _nepalZone,
     DateTime Function()? clock,
-  ]) {
+  }) {
     final today = NepaliDate.today(timeZone: timeZone, clock: clock);
     return NepaliDateRange.forMonth(today.year, today.month);
   }
@@ -87,25 +87,25 @@ final class NepaliDateRange extends IterableBase<NepaliDate> {
   /// The fiscal year that contains today in [timeZone].
   ///
   /// ```dart
-  /// NepaliDateRange.currentFiscalYear('UTC', clock: () => DateTime.utc(2024, 7, 30)).toString();
-  /// // => 2081/04/01 - 2082/03/32
+  /// NepaliDateRange.currentFiscalYear(timeZone: 'UTC', clock: () => DateTime.utc(2024, 7, 30))
+  ///     .toString(); // => 2081/04/01 - 2082/03/32
   /// ```
-  factory NepaliDateRange.currentFiscalYear([
+  factory NepaliDateRange.currentFiscalYear({
     String timeZone = _nepalZone,
     DateTime Function()? clock,
-  ]) =>
+  }) =>
       FiscalYear.containing(NepaliDate.today(timeZone: timeZone, clock: clock)).range();
 
   /// The BS year that contains today in [timeZone].
   ///
   /// ```dart
-  /// NepaliDateRange.currentCalendarYear('UTC', clock: () => DateTime.utc(2024, 7, 30)).toString();
-  /// // => 2081/01/01 - 2081/12/31
+  /// NepaliDateRange.currentCalendarYear(timeZone: 'UTC', clock: () => DateTime.utc(2024, 7, 30))
+  ///     .toString(); // => 2081/01/01 - 2081/12/31
   /// ```
-  factory NepaliDateRange.currentCalendarYear([
+  factory NepaliDateRange.currentCalendarYear({
     String timeZone = _nepalZone,
     DateTime Function()? clock,
-  ]) =>
+  }) =>
       NepaliDateRange.forYear(NepaliDate.today(timeZone: timeZone, clock: clock).year);
 
   /// The first date.
@@ -229,7 +229,7 @@ final class NepaliDateRange extends IterableBase<NepaliDate> {
   /// ends.
   ///
   /// ```dart
-  /// NepaliDateRange.forYear(2081).splitByFiscalQuarter().length; // => 3
+  /// NepaliDateRange.forYear(2081).splitByFiscalQuarter().length; // => 4
   /// ```
   List<NepaliDateRange> splitByFiscalQuarter() {
     final pieces = <NepaliDateRange>[];

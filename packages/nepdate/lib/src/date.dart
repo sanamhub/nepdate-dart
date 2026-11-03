@@ -340,7 +340,7 @@ final class NepaliDate implements Comparable<NepaliDate> {
   /// Throws a [NepDateException] of kind [ErrorKind.outOfRange] past either end of the calendar.
   ///
   /// ```dart
-  /// NepaliDate.fromBs(2081, 4, 15).addDays(30).toString(); // => 2081/05/14
+  /// NepaliDate.fromBs(2081, 4, 15).addDays(30).toString(); // => 2081/05/13
   /// ```
   NepaliDate addDays(int days) {
     final serial = _serial + days;
