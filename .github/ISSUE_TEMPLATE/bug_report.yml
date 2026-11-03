@@ -1,0 +1,39 @@
+name: Bug report
+description: The library returns a wrong result, throws unexpectedly, or does not compile.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: input
+    attributes:
+      label: Input
+      description: The call and its arguments, as a short Dart snippet.
+      placeholder: NepaliDate.fromBs(2081, 4, 15).toString()
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: The result, the exception and its kind, or the analyzer message.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: nepdate or nepdate_patro version
+      placeholder: 0.2.0
+    validations:
+      required: true
+  - type: input
+    id: dart
+    attributes:
+      label: Dart or Flutter version and platform
+      placeholder: Dart 3.6.2, VM on Windows; Flutter 3.27 on Chrome
+    validations:
+      required: true

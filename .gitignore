@@ -6,6 +6,7 @@ build/
 # Coverage and benchmark scratch output
 /coverage/
 /bench/out/
+mutation-test-report/
 
 # IDEs
 /.vs/

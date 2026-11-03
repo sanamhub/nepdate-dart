@@ -1,0 +1,46 @@
+# Contributing
+
+Bug reports, fixes and documentation improvements are welcome. For a new feature or an API change,
+open an issue first so the design can be agreed before you write code.
+
+This project follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report security problems as
+described in [SECURITY.md](SECURITY.md), not in a public issue.
+
+## Scope
+
+The shared calendar and patro data, the spec and the golden vectors live in the hub
+([`sanamhub/nepdate`](https://github.com/sanamhub/nepdate)) and are copied into `shared/`
+read-only. A wrong date, holiday or tithi is a data issue: report it in the hub, not here.
+
+## Setup
+
+You need the Dart SDK 3.6 or newer. The repository is a pub workspace with two published packages,
+`nepdate` and `nepdate_patro`, and a benchmark member that is never published.
+
+```sh
+dart pub get
+dart run tool/ci.dart
+```
+
+`dart run tool/ci.dart` runs every gate in order and stops at the first failure
+([ADR-0006](docs/adr/0006-tests-and-quality-gates.md) lists them).
+
+The calendar tables under `packages/*/lib/src/*.g.dart` are generated and committed. After a change
+to `shared/data/` or `tool/generate.dart`, regenerate them with `dart run tool/generate.dart`.
+
+## Pull requests
+
+- Keep a pull request to one change.
+- Add or update a test for any behaviour change. The shared vector suites must keep passing.
+- A public API change goes in `docs/API.md` in the same commit, with an example that runs.
+- Add a line to the `Unreleased` section of [CHANGELOG.md](CHANGELOG.md) for anything a user would
+  notice.
+- A significant design decision gets an ADR in `docs/adr/`. Accepted ADRs are not edited; a later
+  ADR supersedes an earlier one.
+- CI must pass.
+
+## Commit messages
+
+[Conventional Commits](https://www.conventionalcommits.org/): `type(scope): summary`, imperative,
+lower case, no trailing period. Types: `feat`, `fix`, `docs`, `chore`, `refactor`, `test`, `build`,
+`ci`, `perf`. The body says why, not what.
