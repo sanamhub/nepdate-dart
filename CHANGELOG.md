@@ -31,3 +31,10 @@ repository joins at `0.2.0-rc.1` with the other ports
 - CI on Linux, macOS and Windows, the oldest supported Dart SDK, the hub's shared-check, CodeQL for
   Actions, Scorecard, dependency review, a scheduled mutation run, and the release and
   verify-published workflows.
+
+### Changed
+
+- The development toolchain now requires Dart 3.11.0: `test` 1.33 and the analyzer it resolves
+  require 3.11, `lints` 6.1 requires 3.8, `coverage` 1.16 requires 3.9 and `benchmark_harness` 2.4
+  requires 3.10. The packages themselves still support Dart 3.6, and the published-package check
+  keeps testing 3.6.2.

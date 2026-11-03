@@ -14,7 +14,7 @@ read-only. A wrong date, holiday or tithi is a data issue: report it in the hub,
 
 ## Setup
 
-You need the Dart SDK 3.6 or newer. The repository is a pub workspace with two published packages,
+You need the Dart SDK 3.11 or newer. The repository is a pub workspace with two published packages,
 `nepdate` and `nepdate_patro`, and a benchmark member that is never published.
 
 ```sh

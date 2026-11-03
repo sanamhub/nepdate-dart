@@ -129,11 +129,7 @@ void main() {
 ''');
     final get = await _run(Platform.resolvedExecutable, ['pub', 'get'], directory.path);
     if (get != 0) _fail('dart pub get exited with $get');
-    final run = await _run(
-      Platform.resolvedExecutable,
-      ['run', 'bin/main.dart'],
-      directory.path,
-    );
+    final run = await _run(Platform.resolvedExecutable, ['run', 'bin/main.dart'], directory.path);
     if (run != 0) _fail('the installed example exited with $run');
     if (!File('${directory.path}/pubspec.lock').existsSync()) {
       _fail('dart pub get wrote no lockfile');
