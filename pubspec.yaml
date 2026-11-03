@@ -13,7 +13,7 @@ workspace:
 dev_dependencies:
   coverage: 1.16.0
   lints: 6.1.0
-  mutation_test: 1.7.1
+  mutation_test: 1.8.1
 
 # Newer releases of these transitive dev packages were under 14 days old when the lock was made.
 # analyzer 14.6.0 and _fe_analyzer_shared 110.0.0 become eligible on 2026-11-03; drop the two lines
