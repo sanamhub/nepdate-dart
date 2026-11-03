@@ -16,7 +16,7 @@ jobs:
       contents: write
       pull-requests: write
       actions: write
-    uses: sanamhub/nepdate/.github/workflows/shared-sync.yml@bdb75ee69c85cd928ee1ed7e3a0547b98986f0e5 # main 2026-11-03
+    uses: sanamhub/nepdate/.github/workflows/shared-sync.yml@760298a4727467b41c9dd72b9a1469d361487c48 # main 2026-11-03
     with:
       regenerate: dart pub get && dart run tool/generate.dart
       dart-sdk: true
