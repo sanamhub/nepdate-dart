@@ -1,12 +1,63 @@
-# NepDate for Dart
+<p align="center">
+  <img src="https://raw.githubusercontent.com/sanamhub/nepdate-dart/main/docs/assets/nepdate-dart-128.png" width="128" alt="NepDate for Dart logo">
+</p>
 
-Bikram Sambat (the Nepali calendar) dates for Dart and Flutter: conversion to and from Gregorian,
-arithmetic, formatting, parsing, ranges and fiscal years. Pure Dart, no dependencies, every platform
-including the web.
+<h1 align="center">nepdate-dart</h1>
 
-The package has no time zone database of its own. `today` takes a zone name or a fixed offset, or a
-clock you inject, so it never reads a hidden local zone. The tithi, public holidays and events live
-in the separate [`nepdate_patro`](https://pub.dev/packages/nepdate_patro) package.
+<p align="center">
+  <a href="https://github.com/sanamhub/nepdate-dart/actions/workflows/ci.yml"><img src="https://github.com/sanamhub/nepdate-dart/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://pub.dev/packages/nepdate"><img src="https://img.shields.io/pub/v/nepdate?include_prereleases&label=nepdate&logo=dart&logoColor=white" alt="nepdate on pub.dev"></a>
+  <a href="https://pub.dev/packages/nepdate_patro"><img src="https://img.shields.io/pub/v/nepdate_patro?include_prereleases&label=nepdate_patro&logo=dart&logoColor=white" alt="nepdate_patro on pub.dev"></a>
+  <img src="https://img.shields.io/badge/Dart-%5E3.6.0-0175C2?logo=dart&logoColor=white" alt="Dart ^3.6.0">
+  <a href="https://github.com/sanamhub/nepdate-dart/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue" alt="License: MIT"></a>
+</p>
+
+Bikram Sambat (Nepali calendar) dates for Dart and Flutter: conversion to and from Gregorian,
+arithmetic, formatting, parsing, ranges and fiscal years. Part of the NepDate family: the shared
+data and spec live in the hub [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate); the C#
+original is [NepDate](https://github.com/RajuPrasai/NepDate).
+
+> **Status:** 0.2.0-rc.1 is the first release of the Dart port and is not on pub.dev yet. The API
+> is listed in [docs/API.md](https://github.com/sanamhub/nepdate-dart/blob/main/docs/API.md) and
+> may still change before 0.2.0. Patro data (tithi, holidays, events) is informational, not an
+> official calendar.
+
+Two pub.dev packages, released together with the same version and one tag:
+
+- [`nepdate`](https://pub.dev/packages/nepdate): dates, conversion, arithmetic, formatting,
+  parsing, ranges and fiscal years. No dependencies and no event data.
+- [`nepdate_patro`](https://pub.dev/packages/nepdate_patro): the patro (पात्रो, the Nepali almanac):
+  tithi, public holidays and events from BS 2077-01-01 to 2084-08-20. It depends on `nepdate`.
+
+Pure Dart, so it runs on the VM, in Flutter on every platform and on the web. There is no time zone
+database: `today` takes a zone name or a fixed offset, or a clock you inject, so it never reads a
+hidden local zone. BS 1901-01-01 to 2199-12-30 (AD 1844-04-11 to 2143-04-15), with the same results
+as C# NepDate and the other ports, proved by the shared vectors.
+
+## Install
+
+```sh
+dart pub add nepdate
+```
+
+In a Flutter app, use `flutter pub add nepdate`. While only the release candidate exists, pub picks
+it; pin `nepdate: 0.2.0-rc.1` in `pubspec.yaml` to stay on this one.
+
+```dart
+import 'package:nepdate/nepdate.dart';
+```
+
+The tithi, holidays and events are the second package:
+
+```sh
+dart pub add nepdate_patro
+```
+
+```dart
+import 'package:nepdate_patro/nepdate_patro.dart';
+```
+
+## Quick start
 
 ```dart
 import 'package:nepdate/nepdate.dart';
@@ -15,26 +66,6 @@ final date = NepaliDate.fromBs(2081, 4, 15);
 date.toString(); // => 2081/04/15
 date.toDateTime().toIso8601String(); // => 2024-07-30T00:00:00.000Z
 date.toLongString(weekday: true); // => Tuesday, Shrawan 15, 2081
-```
-
-## Install
-
-```sh
-dart pub add nepdate
-```
-
-```dart
-import 'package:nepdate/nepdate.dart';
-```
-
-The tithi, holidays and events are a second package:
-
-```sh
-dart pub add nepdate_patro
-```
-
-```dart
-import 'package:nepdate_patro/nepdate_patro.dart';
 ```
 
 ## Dates
@@ -193,11 +224,17 @@ NepaliDate.fromBs(2081, 4, 16)
     .isToday('Asia/Kathmandu', clock: () => DateTime.utc(2024, 7, 30, 18, 30)); // => true
 ```
 
-## Patro
+## Patro: tithi, holidays and events
 
-The `nepdate_patro` package compiles the tithi, public holiday and event data into constant tables.
-`info` never throws: a day without data, and any day outside the coverage, gets an empty
-`CalendarInfo`. The data covers BS 2077-01-01 to 2084-08-20.
+The core has no patro data. Add both packages:
+
+```sh
+dart pub add nepdate nepdate_patro
+```
+
+The `nepdate_patro` package compiles the tithi, public holiday and event data into constant tables,
+so nothing is read or parsed at run time. `info` never throws: a day without data, and any day
+outside the coverage, gets an empty `CalendarInfo`. The data covers BS 2077-01-01 to 2084-08-20.
 
 ```dart
 import 'package:nepdate/nepdate.dart';
@@ -211,7 +248,7 @@ coverage().start.toString(); // => 2077/01/01
 publicHolidays().length; // => 294
 ```
 
-## Supported versions
+## Supported versions and platforms
 
 - Dart `^3.6.0`, tested on 3.6 and the current stable release.
 - Every platform Dart supports: the VM, Flutter on Android, iOS, macOS, Windows and Linux, and the
@@ -220,25 +257,52 @@ publicHolidays().length; // => 294
 
 ## Data and correctness
 
-The calendar data is the same data every NepDate port uses, from the hub repository. The test suite
-loads every shared vector file, including the golden output of C# NepDate 2.0.7, and the properties
-the specification states. Dates and behaviour come from `shared/spec`, not from another port's
-README.
-
-NepDate for Dart is a port of [NepDate](https://github.com/RajuPrasai/NepDate), the C# library by
-Raju Prasai. The data and the behaviour follow it with the deliberate, documented deviations in the
-hub's `spec/PARITY.md`. See [NOTICE](NOTICE) for the attribution.
+The calendar data is the same data every NepDate port uses, a read-only copy of the hub's
+`shared/data/`. The test suite loads every shared vector file, including the golden output of C#
+NepDate 2.0.7, and the properties the specification states. Dates and behaviour come from
+`shared/spec`, not from another port's README. Month lengths beyond the officially published
+calendar are projections inherited from C# NepDate.
 
 ## Documentation
 
-| Topic | Where |
+| Page | What it covers |
 |---|---|
-| Every public type and member, with an example | [docs/API.md](docs/API.md) |
-| Benchmarks and the competitors they compare | [docs/benchmarks.md](docs/benchmarks.md), [docs/competitors.md](docs/competitors.md) |
-| Design decisions | [docs/adr](docs/adr/README.md) |
-| Releasing | [docs/runbooks/release.md](docs/runbooks/release.md) |
-| What changed | [CHANGELOG.md](CHANGELOG.md) |
+| [API](https://github.com/sanamhub/nepdate-dart/blob/main/docs/API.md) | Every public type and member, with an example |
+| [Benchmarks](https://github.com/sanamhub/nepdate-dart/blob/main/docs/benchmarks.md) | B1 to B8 against `nepali_utils` and C# NepDate |
+| [Competitors](https://github.com/sanamhub/nepdate-dart/blob/main/docs/competitors.md) | The pub.dev packages considered for the benchmark |
+| [ADRs](https://github.com/sanamhub/nepdate-dart/blob/main/docs/adr/README.md) | Why the design is what it is |
+| [Release](https://github.com/sanamhub/nepdate-dart/blob/main/docs/runbooks/release.md) | Tagging, publishing and the post-publish check |
+| [Changelog](https://github.com/sanamhub/nepdate-dart/blob/main/CHANGELOG.md) | What changed in each version |
+| [Contributing](https://github.com/sanamhub/nepdate-dart/blob/main/CONTRIBUTING.md) | Setup, gates and commits |
+| [Security](https://github.com/sanamhub/nepdate-dart/blob/main/SECURITY.md) | Reporting a vulnerability |
+| [Data error form](https://github.com/sanamhub/nepdate/issues/new/choose) | A wrong date, holiday or tithi, reported in the hub |
+| [Spec](https://github.com/sanamhub/nepdate/tree/main/spec) | Behaviour and vectors, in the hub |
+| [Other languages](https://github.com/sanamhub/nepdate#packages) | The same library in the other NepDate ports |
+
+## Benchmarks
+
+`bench/` measures B1 to B8 of the shared benchmark specification against `nepali_utils`, the one
+pub.dev package that passes the competitor bar, and against the C# NepDate baseline. The machine,
+the method and the current numbers are in
+[docs/benchmarks.md](https://github.com/sanamhub/nepdate-dart/blob/main/docs/benchmarks.md).
+
+## Contributing
+
+Bug reports, fixes and documentation improvements are welcome; open an issue before a new feature
+or an API change. `dart run tool/ci.dart` runs every gate and must pass before a pull request. The
+details are in
+[CONTRIBUTING.md](https://github.com/sanamhub/nepdate-dart/blob/main/CONTRIBUTING.md).
+
+## Credit
+
+NepDate for Dart is a port of [NepDate](https://github.com/RajuPrasai/NepDate), the C# library by
+Raju Prasai and contributors. The data and the behaviour follow it with the deliberate, documented
+deviations in the hub's
+[`spec/PARITY.md`](https://github.com/sanamhub/nepdate/blob/main/spec/PARITY.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE) and [NOTICE](NOTICE).
+MIT ([LICENSE](https://github.com/sanamhub/nepdate-dart/blob/main/LICENSE)). Calendar and patro
+data from NepDate by Raju Prasai and contributors, MIT
+([NOTICE](https://github.com/sanamhub/nepdate-dart/blob/main/NOTICE)). Not affiliated with the
+Government of Nepal.
