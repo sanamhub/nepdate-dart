@@ -20,8 +20,8 @@ These are done once, before the first release. They need the repository and the 
    Search Console, such as `nepdate.com`. Automated publishing is set up after the first version
    exists, in "The first release" below, because pub.dev only offers it on a package that has been
    published once.
-6. Add the `SYNC_APP_PRIVATE_KEY` secret for the shared-sync workflow. The app is the one the other
-   ports use; its private key goes in the repository secret, never in a file.
+6. Nothing to add for shared-sync. It opens its weekly pull request with the built-in token; the
+   optional GitHub App in the hub's data-update runbook is not set up on any port.
 7. Confirm the CodeQL setup. Dart is not a CodeQL language, so the workflow scans Actions only and
    `SECURITY.md` says so. Do not add a fake Dart CodeQL job.
 8. Create the `published-check` label, which the scheduled verify job uses for its issue.
