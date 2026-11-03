@@ -81,18 +81,15 @@ double _coverage(String packageDir) {
     quiet: true,
   );
   final lcov = '${File(covDir).absolute.path}/lcov.info';
-  _run(
-      _dart,
-      [
-        'run',
-        'coverage:format_coverage',
-        '--lcov',
-        '--in=${File(covDir).absolute.path}',
-        '--out=$lcov',
-        '--packages=${File('.dart_tool/package_config.json').absolute.path}',
-        '--report-on=${File('$packageDir/lib').absolute.path}',
-      ],
-      quiet: true);
+  _run(_dart, [
+    'run',
+    'coverage:format_coverage',
+    '--lcov',
+    '--in=${File(covDir).absolute.path}',
+    '--out=$lcov',
+    '--packages=${File('.dart_tool/package_config.json').absolute.path}',
+    '--report-on=${File('$packageDir/lib').absolute.path}',
+  ], quiet: true);
   var hit = 0;
   var found = 0;
   for (final line in File(lcov).readAsLinesSync()) {

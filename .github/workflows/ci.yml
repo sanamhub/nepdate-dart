@@ -34,8 +34,10 @@ jobs:
       - run: dart pub get
       - run: dart run tool/ci.dart
 
-  # The package says ^3.6.0, so 3.6.2 must build, analyze and pass the tests. The formatter is not
-  # run here because its output changed in later SDKs; the stable job checks it.
+  # The workspace dev toolchain says ^3.11.0, so 3.11.0 must build, analyze and pass the tests. The
+  # packages themselves still declare ^3.6.0, and verify-published keeps checking them on 3.6.2. The
+  # formatter is not run here because its output depends on the package language version; the stable
+  # job checks it.
   oldest-sdk:
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -45,7 +47,7 @@ jobs:
           persist-credentials: false
       - uses: dart-lang/setup-dart@6afc89df92d6eb3834022f73cd65adc8cdfcb92d # v1.8.1
         with:
-          sdk: 3.6.2
+          sdk: 3.11.0
       - run: dart pub get
       - run: dart analyze --fatal-infos
       - run: dart run tool/generate.dart --check
