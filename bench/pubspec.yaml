@@ -1,0 +1,15 @@
+name: nepdate_bench
+description: Benchmarks for the nepdate packages. Not published.
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  benchmark_harness: 2.3.1
+  nepali_utils: 3.0.8
+  nepdate:
+    path: ../packages/nepdate
+  nepdate_patro:
+    path: ../packages/nepdate_patro
