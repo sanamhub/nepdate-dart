@@ -16,10 +16,10 @@ These are done once, before the first release. They need the repository and the 
    conversation resolution, and disallow force pushes and deletion.
 4. Create the `production` environment with a tag rule that accepts `v*` and a required reviewer.
    Only this environment can publish.
-5. On pub.dev, verify the publisher `sanamhub` and add both packages to it. Enable automated
-   publishing for `nepdate` and for `nepdate_patro` with the repository `sanamhub/nepdate-dart`,
-   workflow `release.yml`, environment `production`, and the tag pattern `v{{version}}`. The
-   `id-token: write` permission in the workflow only works after this step.
+5. On pub.dev, create a verified publisher. A publisher is a domain verified through Google
+   Search Console, such as `nepdate.com`. Automated publishing is set up after the first version
+   exists, in "The first release" below, because pub.dev only offers it on a package that has been
+   published once.
 6. Add the `SYNC_APP_PRIVATE_KEY` secret for the shared-sync workflow. The app is the one the other
    ports use; its private key goes in the repository secret, never in a file.
 7. Confirm the CodeQL setup. Dart is not a CodeQL language, so the workflow scans Actions only and
@@ -61,11 +61,23 @@ run needs no action.
 
 - A gate failure: fix it on `main` and push a new tag. Never move a published tag.
 - An already-published version: expected on a retry, the job prints a line and continues.
-- OIDC failure: the publisher or the environment is not configured. Repeat owner step 4.
+- OIDC failure: the publisher or the environment is not configured. Check the automated publishing settings from "The first release".
 - A bad artifact after publishing: pub.dev does not allow deleting a version. Yank it on pub.dev,
   add a changelog entry, and publish the next patch.
 
-## The first pull request
+## The first release
 
-The first release is the tag flow above. A manual `dart pub publish` is never the first publish of
-either package; the owner enables automated publishing first, and the tag pipeline does the rest.
+pub.dev creates a package only from a manual `dart pub publish`, and its automated publishing
+settings exist only on a package that has been published. So `0.2.0-rc.1` goes out by hand, once:
+
+1. Merge the version pull request as in "Cutting a release", steps 1 to 3, but do not tag yet.
+2. From a clean checkout of that merge commit, run `dart run tool/ci.dart`, then
+   `dart pub publish` in `packages/nepdate` and then in `packages/nepdate_patro`. The core goes
+   first because the patro package depends on it.
+3. On pub.dev, move both packages to the publisher, then enable automated publishing for each with
+   the repository `sanamhub/nepdate-dart`, the tag pattern `v{{version}}`, and the environment
+   `production`. The workflow's `id-token: write` only works after this.
+4. Push the tag `v0.2.0-rc.1` on the same commit. `release.yml` finds both versions on pub.dev and
+   skips publishing, then `verify-published.yml` checks them and the GitHub release is created.
+
+Every later release is the tag flow alone.

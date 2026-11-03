@@ -278,9 +278,11 @@ final class NepaliDateRange extends IterableBase<NepaliDate> {
       );
 
   Iterable<NepaliDate> _everyDay({int step = 1}) sync* {
-    // Every serial between two valid dates is valid, so nothing is range-checked per step.
-    for (var serial = start._serial; serial <= end._serial; serial += step) {
+    // Every serial between two valid dates is valid, so nothing is range-checked per step. The
+    // loop stops before adding a step that would pass the end, so a huge step cannot overflow.
+    for (var serial = start._serial;; serial += step) {
       yield _fromSerial(serial);
+      if (end._serial - serial < step) return;
     }
   }
 

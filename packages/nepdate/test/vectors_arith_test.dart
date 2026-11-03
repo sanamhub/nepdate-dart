@@ -224,6 +224,16 @@ void main() {
     expect(() => range.datesWithInterval(0), throwsArgumentError);
     expect(() => NepaliDateRange.fromDayCount(bs('2081-04-15'), 0), throwsArgumentError);
   });
+
+  test('a step longer than the range stops instead of overflowing', () {
+    final all = NepaliDateRange.of(NepaliDate.min, NepaliDate.max);
+    final span = all.length - 1;
+    expect(all.datesWithInterval(span).toList(), [NepaliDate.min, NepaliDate.max]);
+    expect(all.datesWithInterval(span + 1).toList(), [NepaliDate.min]);
+    // The largest native int: adding it to any serial above 0 would wrap.
+    final late = NepaliDateRange.of(bs('2199-12-01'), NepaliDate.max);
+    expect(late.datesWithInterval(-1 >>> 1).toList(), [bs('2199-12-01')]);
+  });
 }
 
 NepaliDate _bsOrThrow(String text) => bs(text);

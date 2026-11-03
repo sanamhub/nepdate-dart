@@ -24,9 +24,11 @@ GitHub repository does not exist yet; the owner creates it before the first rele
   macOS and Windows, installs the published packages, and runs one conversion, one parse and one
   patro lookup. A scheduled failure opens one issue labelled `published-check`.
 - The runbook in `docs/runbooks/release.md` lists the owner steps in order: create the repository,
-  protect `main`, create the `production` environment with its tag rule, enable automated publishing
-  for both packages on pub.dev, and add the shared-sync app key. The first version is published
-  only through this pipeline, after the owner has enabled it.
+  protect `main`, create the `production` environment with its tag rule, and add the shared-sync
+  app key. pub.dev creates a package only from a manual `dart pub publish` and offers automated
+  publishing only on an existing package, so the owner publishes the first version by hand, enables
+  automated publishing for both packages, and then pushes the tag. Every later version goes
+  through this pipeline only.
 - `scripts/version.dart` reads and checks the version, `scripts/release_check.dart` compares the tag,
   the manifests and the changelog, and `scripts/verify_published.dart` is the installed check.
 
