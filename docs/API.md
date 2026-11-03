@@ -128,8 +128,19 @@ are not ported (`D-11`).
 | `-` | `DateDiff operator -(NepaliDate other)` | `this - other`, the C# direction (`D-07`). |
 
 `MonthOverflow.clamp` uses the last day of a shorter target month; `MonthOverflow.spill` carries the
-extra days into the next month. The `DateDiff` fields are `negative`, `years`, `months`, `days` and
-`totalDays`, and the breakdown counts from the earlier of the two dates.
+extra days into the next month. The breakdown counts from the earlier of the two dates.
+
+A `DateDiff` is a value: equal fields make equal values, and `totalDays` is signed.
+
+| Member | Signature | Notes |
+|---|---|---|
+| `negative` | `final bool negative` | True when the second date is before the first. |
+| `years` | `final int years` | Whole years, 0 to 298. |
+| `months` | `final int months` | Whole months after the years, 0 to 11. |
+| `days` | `final int days` | Days after the months, 0 to 32. |
+| `totalDays` | `final int totalDays` | Signed days; `other - this` from `diff`, `this - other` from `-`. |
+| `==`, `hashCode` | value equality | The five fields. |
+| `toString` | `String toString()` | A short readable form, for logs and failure messages. |
 
 ```dart
 final date = NepaliDate.fromBs(2081, 4, 32);
