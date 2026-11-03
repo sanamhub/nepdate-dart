@@ -67,9 +67,7 @@ void main() {
           '${date.day.toString().padLeft(2, '0')}',
   ];
   final adDates = [for (final date in dates) date.toDateTime()];
-  final adFields = [
-    for (final date in adDates) (date.year, date.month, date.day),
-  ];
+  final adFields = [for (final date in adDates) (date.year, date.month, date.day)];
 
   stdout.writeln('nepdate ${Platform.version.split(' ').first} on ${Platform.operatingSystem}');
   stdout.writeln('64 inputs, ns per operation, lower is better');

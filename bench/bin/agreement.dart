@@ -28,11 +28,7 @@ void main() {
   var adToBs = 0;
   for (final date in _dates()) {
     final ad = date.toDateTime();
-    final competitorAd = competitor.NepaliDateTime(
-      date.year,
-      date.month,
-      date.day,
-    ).toDateTime();
+    final competitorAd = competitor.NepaliDateTime(date.year, date.month, date.day).toDateTime();
     if (competitorAd.year == ad.year &&
         competitorAd.month == ad.month &&
         competitorAd.day == ad.day) {
