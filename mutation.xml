@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Mutation testing for both libraries. The scheduled workflow runs it with the workspace's
+     lcov file; a pull request never does. ADR-0009 explains the policy. -->
+<mutations version="1.1">
+  <!-- The source files are listed one by one. The generated tables and the library entry points
+       that only export parts are left out: a table is data, not logic. -->
+  <files>
+    <file>packages/nepdate/lib/src/date.dart</file>
+    <file>packages/nepdate/lib/src/errors.dart</file>
+    <file>packages/nepdate/lib/src/fiscal.dart</file>
+    <file>packages/nepdate/lib/src/format.dart</file>
+    <file>packages/nepdate/lib/src/gregorian.dart</file>
+    <file>packages/nepdate/lib/src/names.dart</file>
+    <file>packages/nepdate/lib/src/parse.dart</file>
+    <file>packages/nepdate/lib/src/range.dart</file>
+    <file>packages/nepdate_patro/lib/nepdate_patro.dart</file>
+  </files>
+  <exclude>
+    <!-- A comment is not code. -->
+    <token begin="//" end="\n"/>
+  </exclude>
+  <commands>
+    <command group="test" expected-return="0" timeout="600">dart test packages/nepdate packages/nepdate_patro</command>
+  </commands>
+  <!-- docs/mutation/floor.json records the same number. A survivor that cannot be killed is
+       explained in docs/mutation/equivalent.md before the floor moves. -->
+  <threshold failure="50">
+    <rating over="80" name="A"/>
+    <rating over="60" name="B"/>
+    <rating over="0" name="F"/>
+  </threshold>
+</mutations>

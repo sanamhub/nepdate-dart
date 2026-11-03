@@ -1,0 +1,47 @@
+# Mutation testing (ADR-0009). It runs weekly and by hand, never on a pull request: a full run
+# takes many minutes because every mutant runs the whole test suite.
+name: mutation
+
+on:
+  schedule:
+    - cron: "17 4 * * 3"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - name: Coverage for the covered-lines filter
+        run: |
+          set -euo pipefail
+          rm -rf .dart_tool/mutation-coverage
+          mkdir -p .dart_tool/mutation-coverage
+          dart test packages/nepdate --coverage=.dart_tool/mutation-coverage --reporter=compact
+          dart run coverage:format_coverage \
+            --lcov --in=.dart_tool/mutation-coverage --out=.dart_tool/mutation-coverage/lcov.info \
+            --packages=.dart_tool/package_config.json --report-on=packages/nepdate/lib
+      - name: Run mutation testing
+        run: >-
+          dart run mutation_test
+          -c .dart_tool/mutation-coverage/lcov.info
+          -o mutation-test-report
+          mutation.xml
+      - name: Keep the report
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: mutation-report
+          path: mutation-test-report/
+          if-no-files-found: warn
+          retention-days: 30

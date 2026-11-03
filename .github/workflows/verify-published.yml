@@ -1,0 +1,187 @@
+# Installs one published version of both packages from pub.dev the way a user does, and checks it.
+# release.yml calls it after publishing; it also runs weekly on Linux and daily as a metadata-only
+# check. A scheduled failure opens or updates one issue labelled published-check.
+name: verify-published
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: Published version, or latest for the newest version on pub.dev
+        required: false
+        default: latest
+        type: string
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Published version, or latest for the newest version on pub.dev
+        required: false
+        default: latest
+        type: string
+  schedule:
+    # The weekly install check, Monday 06:41 UTC.
+    - cron: "41 6 * * 1"
+    # The daily metadata check, which fetches no package archive.
+    - cron: "29 3 * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  resolve:
+    name: resolve the version
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: stable
+      - name: Resolve
+        id: resolve
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          version="${INPUT_VERSION:-latest}"
+          if [ "$version" = latest ]; then
+            version="$(dart scripts/verify_published.dart latest --resolve)"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "Resolved version: \`$version\`" >> "$GITHUB_STEP_SUMMARY"
+
+  verify:
+    name: verify ${{ needs.resolve.outputs.version }}
+    if: github.event_name != 'schedule'
+    needs: resolve
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        dart: ["3.6.2", stable]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: ${{ matrix.dart }}
+      - name: Install and check the published packages
+        id: check
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: dart scripts/verify_published.dart "$VERSION" --metadata --install
+      - name: Keep the failing output
+        if: failure()
+        run: echo "install failed on ${{ matrix.os }} with Dart ${{ matrix.dart }}" > failure.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: failure-verify-${{ matrix.os }}-${{ matrix.dart }}
+          path: failure.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # The weekly check: Linux only, one entry per package manager. pub is the only manager the
+  # packages have, so the matrix has one entry.
+  weekly:
+    name: weekly ${{ needs.resolve.outputs.version }}
+    if: github.event_name == 'schedule' && github.event.schedule == '41 6 * * 1'
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        manager: [pub]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: stable
+      - name: Install and check the published packages
+        id: check
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+          MANAGER: ${{ matrix.manager }}
+        run: dart scripts/verify_published.dart "$VERSION" --metadata --install
+      - name: Keep the failing output
+        if: failure()
+        run: echo "install failed for $MANAGER" > failure.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: failure-weekly-${{ matrix.manager }}
+          path: failure.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # The daily check: pub.dev still lists the version and answers for both archives, with no
+  # download, so it cannot look like install traffic.
+  metadata:
+    name: metadata ${{ needs.resolve.outputs.version }}
+    if: github.event_name == 'schedule' && github.event.schedule == '29 3 * * *'
+    needs: resolve
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: stable
+      - name: Check the registry listing
+        id: check
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: dart scripts/verify_published.dart "$VERSION" --metadata
+      - name: Keep the failing output
+        if: failure()
+        run: echo "metadata check failed for $VERSION" > failure.txt
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: failure()
+        with:
+          name: failure-metadata
+          path: failure.txt
+          if-no-files-found: ignore
+          retention-days: 7
+
+  # The only job with write access. It reads the artifacts the check jobs kept and opens or updates
+  # one issue; it never installs anything and never touches the registry.
+  report:
+    name: report
+    if: failure() && github.event_name == 'schedule'
+    needs: [resolve, verify, weekly, metadata]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Open or update the issue
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          title="published-check: nepdate $VERSION"
+          body="The scheduled published check failed for \`$VERSION\` (\`$RUN_URL\`). See the artifacts on the run and the \`published-check\` label."
+          number="$(gh issue list --label published-check --state open --search "$title in:title" --json number --jq '.[0].number // empty')"
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body" --label published-check
+          fi

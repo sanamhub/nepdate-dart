@@ -1,0 +1,85 @@
+# Every gate of ADR-0006 on Linux, macOS and Windows, plus the oldest supported Dart SDK and the
+# hub's shared-check. A green run here is the same gate a release runs.
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  # shared-sync starts CI this way on the PR it opens with GITHUB_TOKEN.
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ci:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: stable
+      - run: dart pub get
+      - run: dart run tool/ci.dart
+
+  # The package says ^3.6.0, so 3.6.2 must build, analyze and pass the tests. The formatter is not
+  # run here because its output changed in later SDKs; the stable job checks it.
+  oldest-sdk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: 3.6.2
+      - run: dart pub get
+      - run: dart analyze --fatal-infos
+      - run: dart run tool/generate.dart --check
+      - run: dart test packages/nepdate packages/nepdate_patro
+
+  version:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dart-lang/setup-dart@e51d8e571e22473a2ddebf0ef8a2123f0ab2c02c # v1.7.1
+        with:
+          sdk: stable
+      - name: Read the version shared by both packages
+        id: version
+        run: |
+          set -euo pipefail
+          if ! version="$(dart scripts/version.dart)"; then
+            echo "$version" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+  # Fails when shared/ differs from the hub at the commit in shared/VERSION, and when this port is
+  # on another MAJOR.MINOR line (hub ADR-0007 decision 3).
+  shared-check:
+    needs: version
+    permissions:
+      contents: read
+    uses: sanamhub/nepdate/.github/workflows/shared-check.yml@f636b7d476bc5959eb5689a950b73c8943860eef # main 2026-11-01
+    with:
+      sdk: dart
+      version: ${{ needs.version.outputs.version }}
