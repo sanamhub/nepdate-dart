@@ -9,19 +9,22 @@ These are done once, before the first release. They need the repository and the 
 
 1. Create the GitHub repository `sanamhub/nepdate-dart` with `main` as the default branch. The
    repository is public.
-2. Protect `main`: require a pull request, require the `ci` check, require one review, require
+2. Push the hub branch `feat/nepdate-dart`. The port's `shared/VERSION` names its head, and
+   `shared-check` downloads that commit from `sanamhub/nepdate`, so the branch must exist on GitHub
+   even before it is merged for the first release.
+3. Protect `main`: require a pull request, require the `ci` check, require one review, require
    conversation resolution, and disallow force pushes and deletion.
-3. Create the `production` environment with a tag rule that accepts `v*` and a required reviewer.
+4. Create the `production` environment with a tag rule that accepts `v*` and a required reviewer.
    Only this environment can publish.
-4. On pub.dev, verify the publisher `sanamhub` and add both packages to it. Enable automated
+5. On pub.dev, verify the publisher `sanamhub` and add both packages to it. Enable automated
    publishing for `nepdate` and for `nepdate_patro` with the repository `sanamhub/nepdate-dart`,
    workflow `release.yml`, environment `production`, and the tag pattern `v{{version}}`. The
    `id-token: write` permission in the workflow only works after this step.
-5. Add the `SYNC_APP_PRIVATE_KEY` secret for the shared-sync workflow. The app is the one the other
+6. Add the `SYNC_APP_PRIVATE_KEY` secret for the shared-sync workflow. The app is the one the other
    ports use; its private key goes in the repository secret, never in a file.
-6. Confirm the CodeQL setup. Dart is not a CodeQL language, so the workflow scans Actions only and
+7. Confirm the CodeQL setup. Dart is not a CodeQL language, so the workflow scans Actions only and
    `SECURITY.md` says so. Do not add a fake Dart CodeQL job.
-7. Create the `published-check` label, which the scheduled verify job uses for its issue.
+8. Create the `published-check` label, which the scheduled verify job uses for its issue.
 
 ## Cutting a release
 
