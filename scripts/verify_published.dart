@@ -107,8 +107,12 @@ void main() {
   if (NepaliDate.fromYmd(date.ymd) != date) {
     throw StateError('fromYmd gave a different date');
   }
-  if (date.addMonths(2).toJson() != '2081-06-30') {
+  if (date.addMonths(2).toJson() != '2081-06-15') {
     throw StateError('addMonths gave ${date.addMonths(2)}');
+  }
+  final lastDay = NepaliDate.fromBs(2081, 4, 32);
+  if (lastDay.addMonths(2).toJson() != '2081-06-30') {
+    throw StateError('addMonths clamp gave ${lastDay.addMonths(2)}');
   }
   if (date.toLongString(weekday: true) != 'Tuesday, Shrawan 15, 2081') {
     throw StateError('toLongString gave ${date.toLongString(weekday: true)}');
