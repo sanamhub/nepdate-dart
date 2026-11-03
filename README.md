@@ -17,10 +17,9 @@ arithmetic, formatting, parsing, ranges and fiscal years. Part of the NepDate fa
 data and spec live in the hub [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate); the C#
 original is [NepDate](https://github.com/RajuPrasai/NepDate).
 
-> **Status:** 0.2.0-rc.1 is the first release of the Dart port and is not on pub.dev yet. The API
-> is listed in [docs/API.md](https://github.com/sanamhub/nepdate-dart/blob/main/docs/API.md) and
-> may still change before 0.2.0. Patro data (tithi, holidays, events) is informational, not an
-> official calendar.
+> **Status:** 0.2.0-rc.1, a release candidate, on pub.dev. The API is listed in
+> [docs/API.md](https://github.com/sanamhub/nepdate-dart/blob/main/docs/API.md) and may still change
+> before 0.2.0. Patro data (tithi, holidays, events) is informational, not an official calendar.
 
 Two pub.dev packages, released together with the same version and one tag:
 
