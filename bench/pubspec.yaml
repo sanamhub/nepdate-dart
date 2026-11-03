@@ -4,10 +4,10 @@ publish_to: none
 resolution: workspace
 
 environment:
-  sdk: ^3.6.0
+  sdk: ^3.10.0
 
 dependencies:
-  benchmark_harness: 2.3.1
+  benchmark_harness: 2.4.0
   nepali_utils: 3.0.8
   nepdate:
     path: ../packages/nepdate

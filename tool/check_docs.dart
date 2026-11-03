@@ -35,9 +35,7 @@ class Snippet {
 }
 
 class Chunk {
-  Chunk.code(this.lines)
-      : expression = null,
-        expected = null;
+  Chunk.code(this.lines) : expression = null, expected = null;
 
   Chunk.expect(this.expression, this.expected) : lines = const <String>[];
 
@@ -169,8 +167,8 @@ List<Chunk> _chunks(String code) {
     current.add(line);
     final withoutComment = line.split(_resultMarker).first;
     for (final unit in withoutComment.codeUnits) {
-      if (unit == 0x7B /* { */) depth++;
-      if (unit == 0x7D /* } */) depth--;
+      if (unit == 0x7B /* { */ ) depth++;
+      if (unit == 0x7D /* } */ ) depth--;
     }
     if (depth <= 0 && withoutComment.trimRight().endsWith(';')) flush();
     if (withoutComment.trim() == '}') flush();
@@ -270,7 +268,7 @@ void _prose() {
     'CHANGELOG.md',
     'CONTRIBUTING.md',
     'SECURITY.md',
-    'AGENTS.md',
+    'CODE_OF_CONDUCT.md',
   ];
   final docsDir = Directory('docs');
   if (docsDir.existsSync()) {
@@ -381,10 +379,10 @@ void main() {
   final target = File('.dart_tool/docs_examples.dart')
     ..createSync(recursive: true)
     ..writeAsStringSync(program.toString());
-  final result = Process.runSync(
-    Platform.resolvedExecutable,
-    ['--packages=.dart_tool/package_config.json', target.path],
-  );
+  final result = Process.runSync(Platform.resolvedExecutable, [
+    '--packages=.dart_tool/package_config.json',
+    target.path,
+  ]);
   final out = '${result.stdout}'.trim();
   final err = '${result.stderr}'.trim();
   if (out.isNotEmpty) stdout.writeln(out);

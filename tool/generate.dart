@@ -152,12 +152,13 @@ _Named _named(Object? value, String where) {
 }
 
 List<_Day> _readDays(List<int> starts) {
-  final files = Directory('shared/data/patro')
-      .listSync()
-      .whereType<File>()
-      .where((f) => RegExp(r'[\\/]\d{4}\.json$').hasMatch(f.path))
-      .toList()
-    ..sort((a, b) => a.path.compareTo(b.path));
+  final files =
+      Directory('shared/data/patro')
+          .listSync()
+          .whereType<File>()
+          .where((f) => RegExp(r'[\\/]\d{4}\.json$').hasMatch(f.path))
+          .toList()
+        ..sort((a, b) => a.path.compareTo(b.path));
   if (files.isEmpty) _fail('shared/data/patro has no year files');
   final days = <_Day>[];
   final seen = <int>{};
@@ -210,10 +211,10 @@ String _patroSource(List<int> starts) {
   final namesNp = <String>[];
   final namesEn = <String>[];
   int poolId(_Named named) => pool.putIfAbsent(named.key, () {
-        namesNp.add(named.np);
-        namesEn.add(named.en);
-        return namesNp.length - 1;
-      });
+    namesNp.add(named.np);
+    namesEn.add(named.en);
+    return namesNp.length - 1;
+  });
 
   final tithiDays = days.where((d) => d.tithi != null).toList();
   if (tithiDays.isEmpty) _fail('no tithi data');
@@ -231,7 +232,7 @@ String _patroSource(List<int> starts) {
 
   final holidays = [
     for (final d in days)
-      if (d.holiday) d.serial
+      if (d.holiday) d.serial,
   ];
   final eventDays = <int>[];
   final eventCounts = <int>[];
@@ -303,10 +304,7 @@ void main(List<String> arguments) {
   final unknown = arguments.where((a) => a != '--check');
   if (unknown.isNotEmpty) _fail('unknown argument ${unknown.first}');
   final starts = _readMonthStarts();
-  final outputs = {
-    _calendarOut: _calendarSource(starts),
-    _patroOut: _patroSource(starts),
-  };
+  final outputs = {_calendarOut: _calendarSource(starts), _patroOut: _patroSource(starts)};
   var drift = false;
   for (final MapEntry(key: path, value: source) in outputs.entries) {
     final file = File(path);
