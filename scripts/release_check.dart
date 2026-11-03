@@ -23,14 +23,12 @@ String _versionOf(String path) {
 void main(List<String> arguments) {
   if (arguments.length != 1) _fail('usage: dart run scripts/release_check.dart <version>');
   final version = arguments.single;
-  if (!RegExp(r'^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:beta|rc)\.[1-9]\d*)?$')
-      .hasMatch(version)) {
+  if (!RegExp(
+    r'^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-(?:beta|rc)\.[1-9]\d*)?$',
+  ).hasMatch(version)) {
     _fail('$version is not a SemVer version this project uses');
   }
-  for (final path in [
-    'packages/nepdate/pubspec.yaml',
-    'packages/nepdate_patro/pubspec.yaml',
-  ]) {
+  for (final path in ['packages/nepdate/pubspec.yaml', 'packages/nepdate_patro/pubspec.yaml']) {
     final found = _versionOf(path);
     if (found != version) _fail('$path says $found, expected $version');
   }
@@ -40,15 +38,10 @@ void main(List<String> arguments) {
     'packages/nepdate_patro/CHANGELOG.md',
   ]) {
     final text = File(path).readAsStringSync();
-    final heading = RegExp(
-      '^## \\[?${RegExp.escape(version)}\\]?\\s*\$',
-      multiLine: true,
-    );
+    final heading = RegExp('^## \\[?${RegExp.escape(version)}\\]?\\s*\$', multiLine: true);
     if (!heading.hasMatch(text)) {
       _fail('$path has no "## $version" section');
     }
   }
-  stdout.writeln(
-    'release-check: $version matches both manifests and all three changelogs',
-  );
+  stdout.writeln('release-check: $version matches both manifests and all three changelogs');
 }

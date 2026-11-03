@@ -11,6 +11,7 @@
 | [0007](0007-release-and-publishing.md) | One tag, two packages, pub.dev trusted publishing and a scheduled published check |
 | [0008](0008-benchmarks-and-competitors.md) | The B1 to B8 harness and the competitor bar for pub.dev |
 | [0009](0009-mutation-testing.md) | Mutation testing on a schedule, not on every pull request |
+| [0010](0010-minimum-dart-sdk.md) | The development toolchain requires Dart 3.11 |
 
 New decisions add the next number. A decision that changes a published behaviour also updates
 `shared/spec` through the hub, never in this repository alone.
