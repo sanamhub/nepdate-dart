@@ -16,8 +16,9 @@ jobs:
       contents: write
       pull-requests: write
       actions: write
-    uses: sanamhub/nepdate/.github/workflows/shared-sync.yml@f94d67c0c85de7909cf54d7e4e96f226ca750129 # main 2026-10-31
+    uses: sanamhub/nepdate/.github/workflows/shared-sync.yml@bdb75ee69c85cd928ee1ed7e3a0547b98986f0e5 # main 2026-11-03
     with:
       regenerate: dart pub get && dart run tool/generate.dart
+      dart-sdk: true
     secrets:
       SYNC_APP_PRIVATE_KEY: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
