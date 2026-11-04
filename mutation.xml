@@ -20,10 +20,11 @@
     <token begin="//" end="\n"/>
   </exclude>
   <commands>
-    <!-- The suite takes seconds. A mutation that loops forever must be killed and counted as a
-         timeout before the runner's memory limit takes the whole job down. At mutant 148 the
-         test command exhausted the runner in about 50 seconds, so the cap is 30 seconds. -->
-    <command group="test" expected-return="0" timeout="30">dart test packages/nepdate packages/nepdate_patro</command>
+    <!-- The suite takes seconds. At mutant 148 the tests enter a synchronous loop that ignores
+         SIGTERM, so the tool's own timeout leaves the Dart process alive until the runner runs
+         out of memory. GNU timeout sends SIGKILL five seconds after SIGTERM, and its 124 exit
+         counts as a detected mutant. -->
+    <command group="test" expected-return="0" timeout="30">timeout --kill-after=5 20 dart test packages/nepdate packages/nepdate_patro</command>
   </commands>
   <!-- docs/mutation/floor.json records the same number. A survivor that cannot be killed is
        explained in docs/mutation/equivalent.md before the floor moves. -->
