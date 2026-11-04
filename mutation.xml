@@ -21,9 +21,9 @@
   </exclude>
   <commands>
     <!-- The suite takes seconds. A mutation that loops forever must be killed and counted as a
-         timeout before the runner's memory limit takes the whole job down, which happened at
-         mutant 148 with a 600 second timeout. -->
-    <command group="test" expected-return="0" timeout="60">dart test packages/nepdate packages/nepdate_patro</command>
+         timeout before the runner's memory limit takes the whole job down. At mutant 148 the
+         test command exhausted the runner in about 50 seconds, so the cap is 30 seconds. -->
+    <command group="test" expected-return="0" timeout="30">dart test packages/nepdate packages/nepdate_patro</command>
   </commands>
   <!-- docs/mutation/floor.json records the same number. A survivor that cannot be killed is
        explained in docs/mutation/equivalent.md before the floor moves. -->
