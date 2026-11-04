@@ -6,7 +6,11 @@ All notable changes are listed here. The format follows
 repository joins at `0.2.0-rc.1` with the other ports
 ([hub ADR-0007](https://github.com/sanamhub/nepdate/blob/main/docs/adr/0007-one-version-line-for-every-sdk.md)).
 
-## [Unreleased]
+## 1.0.0-rc.1
+
+### Changed
+
+- The API is stable from 1.0 (hub ADR-0009). No code change in these packages; released with the family on the 1.0 line.
 
 ## 0.2.0-rc.1
 

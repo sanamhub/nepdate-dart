@@ -12,8 +12,8 @@ Part of the NepDate family: the shared data and spec live in the hub
 [`sanamhub/nepdate`](https://github.com/sanamhub/nepdate); the C# original is
 [NepDate](https://github.com/RajuPrasai/NepDate).
 
-> **Status:** 0.2.0-rc.1 is the first release. The API may still change before 0.2.0. The patro
-> data is informational, not an official calendar.
+> **Status:** 1.0.0-rc.1 is the release candidate on the 1.0 line. The API is stable from 1.0 (hub
+> ADR-0009). The patro data is informational, not an official calendar.
 
 ## Install
 

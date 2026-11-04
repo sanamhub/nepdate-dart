@@ -3,7 +3,7 @@ description: >-
   The Nepali patro for Dart and Flutter: tithi, public holidays and events for every
   Bikram Sambat day from 2077 to 2084, built on the nepdate package. Pure Dart, runs on
   every platform including the web.
-version: 0.2.0-rc.1
+version: 1.0.0-rc.1
 repository: https://github.com/sanamhub/nepdate-dart
 homepage: https://nepdate.com
 issue_tracker: https://github.com/sanamhub/nepdate-dart/issues
@@ -19,7 +19,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  nepdate: ^0.2.0-rc.1
+  nepdate: ^1.0.0-rc.1
 
 dev_dependencies:
   test: 1.33.0

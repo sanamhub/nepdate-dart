@@ -4,7 +4,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/). The two packages share one version. The repository
 changelog has the full history.
 
-## [Unreleased]
+## 1.0.0-rc.1
+
+### Changed
+
+- The API is stable from 1.0 (hub ADR-0009). No code change in this package; released with the family on the 1.0 line.
 
 ## 0.2.0-rc.1
 
