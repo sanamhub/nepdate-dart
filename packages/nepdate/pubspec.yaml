@@ -3,7 +3,7 @@ description: >-
   Bikram Sambat (Nepali calendar) dates for Dart and Flutter: conversion to and from
   Gregorian, arithmetic, formatting, parsing, ranges and fiscal years. Pure Dart, no
   dependencies, runs on every platform including the web.
-version: 0.2.0-rc.1
+version: 1.0.0-rc.1
 repository: https://github.com/sanamhub/nepdate-dart
 homepage: https://nepdate.com
 issue_tracker: https://github.com/sanamhub/nepdate-dart/issues
