@@ -2,6 +2,7 @@ part of '../nepdate.dart';
 
 const int _months = (kMaxYear - kMinYear + 1) * 12;
 const int _maxSerial = kTotalDays - 1;
+const int _millisecondsPerDay = 86400000;
 
 /// Zone used when none is given: Nepal Standard Time.
 const String _nepalZone = 'Asia/Kathmandu';
@@ -71,22 +72,15 @@ final class NepaliDate implements Comparable<NepaliDate> {
   /// ```dart
   /// NepaliDate.fromBs(2081, 4, 32).toString(); // => 2081/04/32
   /// ```
-  factory NepaliDate.fromBs(int year, int month, int day) {
-    if (year < kMinYear || year > kMaxYear) {
-      throw NepDateException(ErrorKind.outOfRange, 'year $year is outside $kMinYear..$kMaxYear');
-    }
-    if (month < 1 || month > 12) {
-      throw NepDateException(ErrorKind.invalidMonth, 'month $month is outside 1..12');
-    }
+  factory NepaliDate.fromBs(int year, int month, int day) =>
+      _valid(year, month, day) ?? (throw _invalidBs(year, month, day));
+
+  /// The date of [year], [month] and [day], or `null` when they are not a date of the calendar.
+  static NepaliDate? _valid(int year, int month, int day) {
+    if (year < kMinYear || year > kMaxYear || month < 1 || month > 12) return null;
     final index = (year - kMinYear) * 12 + month - 1;
     final start = kMonthStart[index];
-    final length = kMonthStart[index + 1] - start;
-    if (day < 1 || day > length) {
-      throw NepDateException(
-        ErrorKind.invalidDay,
-        'day $day is outside 1..$length for $year-${_pad(month, 2)}',
-      );
-    }
+    if (day < 1 || day > kMonthStart[index + 1] - start) return null;
     return NepaliDate._(year, month, day, start + day - 1);
   }
 
@@ -102,14 +96,15 @@ final class NepaliDate implements Comparable<NepaliDate> {
   /// ```dart
   /// NepaliDate.parse('२०८१/०४/१५').toString(); // => 2081/04/15
   /// ```
-  factory NepaliDate.parse(String text) => _parsedOrThrow(_parseStrict(text));
+  factory NepaliDate.parse(String text) =>
+      _tryParseStrict(text) ?? _parsedOrThrow(_parseStrict(text));
 
   /// Like [NepaliDate.parse], but returns `null` instead of throwing.
   ///
   /// ```dart
   /// NepaliDate.tryParse('2081/13/01'); // => null
   /// ```
-  static NepaliDate? tryParse(String text) => _parseStrict(text).date;
+  static NepaliDate? tryParse(String text) => _tryParseStrict(text);
 
   /// Parses text a person typed (PARSING section 2): month names in English or Nepali, the day
   /// before the year, era markers such as `B.S.`. It rejects rather than guesses, so a two-digit
@@ -140,9 +135,15 @@ final class NepaliDate implements Comparable<NepaliDate> {
   /// NepaliDate.fromGregorian(DateTime.utc(2024, 7, 30)).toString(); // => 2081/04/15
   /// ```
   factory NepaliDate.fromGregorian(DateTime date) {
-    final year = date.year;
-    if (year < 1844 || year > 2143) throw _gregorianOutOfRange(date);
-    final serial = _daysFromCivil(year, date.month, date.day) - kEpochUnixDays;
+    final int serial;
+    if (date.isUtc) {
+      // A UTC value shows the day its epoch milliseconds fall in, so no field is read.
+      serial = (date.millisecondsSinceEpoch / _millisecondsPerDay).floor() - kEpochUnixDays;
+    } else {
+      final year = date.year;
+      if (year < 1844 || year > 2143) throw _gregorianOutOfRange(date);
+      serial = _daysFromCivil(year, date.month, date.day) - kEpochUnixDays;
+    }
     if (serial < 0 || serial > _maxSerial) throw _gregorianOutOfRange(date);
     return _fromSerial(serial);
   }
@@ -302,10 +303,10 @@ final class NepaliDate implements Comparable<NepaliDate> {
   /// ```dart
   /// NepaliDate.min.toDateTime().toIso8601String(); // => 1844-04-11T00:00:00.000Z
   /// ```
-  DateTime toDateTime() {
-    final (y, m, d) = _civilFromDays(_serial + kEpochUnixDays);
-    return DateTime.utc(y, m, d);
-  }
+  DateTime toDateTime() => DateTime.fromMillisecondsSinceEpoch(
+        (_serial + kEpochUnixDays) * _millisecondsPerDay,
+        isUtc: true,
+      );
 
   /// True when this is today in [timeZone] (see [NepaliDate.today] for the accepted zones).
   /// A clock outside the supported range makes every date not today.
@@ -458,14 +459,14 @@ final class NepaliDate implements Comparable<NepaliDate> {
 
   /// `YYYY/MM/DD` with ASCII digits.
   @override
-  String toString() => '${_pad(year, 4)}/${_pad(month, 2)}/${_pad(day, 2)}';
+  String toString() => '${_fourDigits(year, Lang.en)}/${_twoDigitsEn[month]}/${_twoDigitsEn[day]}';
 
   /// `YYYY-MM-DD`, the canonical text form for JSON. Read it back with [NepaliDate.fromJson].
   ///
   /// ```dart
   /// NepaliDate.fromBs(2081, 4, 15).toJson(); // => 2081-04-15
   /// ```
-  String toJson() => '${_pad(year, 4)}-${_pad(month, 2)}-${_pad(day, 2)}';
+  String toJson() => '${_fourDigits(year, Lang.en)}-${_twoDigitsEn[month]}-${_twoDigitsEn[day]}';
 
   /// The three parts in [order], joined by [separator]. With [pad] the year has four digits and
   /// the month and day two; without it none are padded.
@@ -503,6 +504,22 @@ final class NepaliDate implements Comparable<NepaliDate> {
   /// NepaliDate.fromBs(2081, 4, 15).format('MMM yyyy'); // => Shr 2081
   /// ```
   String format(String pattern, {Lang lang = Lang.en}) => _pattern(this, pattern, lang);
+}
+
+/// Why [year], [month] and [day] are not a date, checked in that order.
+NepDateException _invalidBs(int year, int month, int day) {
+  if (year < kMinYear || year > kMaxYear) {
+    return NepDateException(ErrorKind.outOfRange, 'year $year is outside $kMinYear..$kMaxYear');
+  }
+  if (month < 1 || month > 12) {
+    return NepDateException(ErrorKind.invalidMonth, 'month $month is outside 1..12');
+  }
+  final index = (year - kMinYear) * 12 + month - 1;
+  final length = kMonthStart[index + 1] - kMonthStart[index];
+  return NepDateException(
+    ErrorKind.invalidDay,
+    'day $day is outside 1..$length for $year-${_pad(month, 2)}',
+  );
 }
 
 NepDateException _outOfRange(String what) => NepDateException(

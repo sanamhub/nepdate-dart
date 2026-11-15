@@ -4,6 +4,13 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/). The two packages share one version. The repository
 changelog has the full history.
 
+## Unreleased
+
+### Changed
+
+- `info` keeps the answer of each day in a list indexed by day, not in a hash map. Measured on the
+  reference machine: one day 25 ns to 4 ns, a month grid 1017 ns to 290 ns.
+
 ## 1.0.0-rc.1
 
 ### Changed

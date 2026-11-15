@@ -6,6 +6,18 @@ All notable changes are listed here. The format follows
 repository joins at `0.2.0-rc.1` with the other ports
 ([hub ADR-0007](https://github.com/sanamhub/nepdate/blob/main/docs/adr/0007-one-version-line-for-every-sdk.md)).
 
+## Unreleased
+
+### Changed
+
+- `nepdate`: faster conversion, formatting and parsing, with the same results for every date.
+  Measured on the reference machine, per operation: AD to BS 77 ns to 39 ns, the long Nepali date
+  567 ns to 158 ns, strict parse 64 ns to 34 ns. Conversion works on the day count without going
+  through year, month and day fields; formatting reads digit and year texts from tables; `parse`
+  and `tryParse` read the text in one pass without allocating.
+- `nepdate_patro`: `info` keeps the answer of each day in a list indexed by day. One day 25 ns to
+  4 ns, a month grid 1017 ns to 290 ns.
+
 ## 1.0.0-rc.1
 
 ### Changed

@@ -19,11 +19,8 @@ _Parsed _fail(ErrorKind kind, String message) => _Parsed.fail(NepDateException(k
 
 /// Validates year, month and day as [NepaliDate.fromBs] does, without throwing.
 _Parsed _validated(int year, int month, int day) {
-  try {
-    return _Parsed.ok(NepaliDate.fromBs(year, month, day));
-  } on NepDateException catch (error) {
-    return _Parsed.fail(error);
-  }
+  final date = NepaliDate._valid(year, month, day);
+  return date != null ? _Parsed.ok(date) : _Parsed.fail(_invalidBs(year, month, day));
 }
 
 /// The separators of PARSING section 1: `- / . _ \ space ।` and `|`.
@@ -44,32 +41,80 @@ int _digit(int unit) {
   return -1;
 }
 
-_Parsed _parseStrict(String text) {
-  final groups = <int>[];
+/// [_scanStrict] result: a number has more than four digits.
+const int _scanTooLong = -1;
+
+/// [_scanStrict] result: the text does not have exactly three numbers.
+const int _scanWrongCount = -2;
+
+/// Each of the three numbers has at most four digits, so they pack into one integer in base
+/// 10000.
+const int _scanBase = 10000;
+
+/// Reads the strict form (PARSING section 1) in one pass, without allocating.
+///
+/// Returns `(year * 10000 + month) * 10000 + day` when the text has exactly three numbers.
+/// Otherwise the result is negative: [_scanTooLong], [_scanWrongCount], or `-(unit + 3)` for a
+/// code unit that is neither a digit nor a separator. The first problem in reading order wins.
+int _scanStrict(String text) {
+  var groups = 0;
+  var packed = 0;
   var digits = 0;
   var value = 0;
-  for (final unit in text.codeUnits) {
+  final length = text.length;
+  for (var i = 0; i < length; i++) {
+    final unit = text.codeUnitAt(i);
     final digit = _digit(unit);
     if (digit >= 0) {
-      if (digits == 4) return _fail(ErrorKind.numberTooLong, 'a number has more than 4 digits');
+      if (digits == 4) return _scanTooLong;
+      if (groups == 3) return _scanWrongCount;
       value = value * 10 + digit;
       digits++;
     } else if (_isSeparator(unit)) {
       if (digits > 0) {
-        groups.add(value);
+        packed = packed * _scanBase + value;
+        groups++;
         value = 0;
         digits = 0;
       }
     } else {
-      return _fail(ErrorKind.invalidCharacter, 'unexpected character U+${_hex(unit)}');
-    }
-    if (groups.length == 3 && digits > 0) {
-      return _fail(ErrorKind.wrongGroupCount, 'expected year, month and day');
+      return -(unit + 3);
     }
   }
-  if (digits > 0) groups.add(value);
-  if (groups.length != 3) return _fail(ErrorKind.wrongGroupCount, 'expected year, month and day');
-  return _validated(groups[0], groups[1], groups[2]);
+  if (digits > 0) {
+    packed = packed * _scanBase + value;
+    groups++;
+  }
+  return groups == 3 ? packed : _scanWrongCount;
+}
+
+/// The date of a strict text, or `null` for any failure. The fast path of [NepaliDate.parse] and
+/// [NepaliDate.tryParse].
+NepaliDate? _tryParseStrict(String text) {
+  final packed = _scanStrict(text);
+  if (packed < 0) return null;
+  return NepaliDate._valid(
+    packed ~/ (_scanBase * _scanBase),
+    packed ~/ _scanBase % _scanBase,
+    packed % _scanBase,
+  );
+}
+
+/// The strict parse with the reason for a failure.
+_Parsed _parseStrict(String text) {
+  final packed = _scanStrict(text);
+  if (packed >= 0) {
+    return _validated(
+      packed ~/ (_scanBase * _scanBase),
+      packed ~/ _scanBase % _scanBase,
+      packed % _scanBase,
+    );
+  }
+  return switch (packed) {
+    _scanTooLong => _fail(ErrorKind.numberTooLong, 'a number has more than 4 digits'),
+    _scanWrongCount => _fail(ErrorKind.wrongGroupCount, 'expected year, month and day'),
+    _ => _fail(ErrorKind.invalidCharacter, 'unexpected character U+${_hex(-packed - 3)}'),
+  };
 }
 
 String _hex(int unit) => unit.toRadixString(16).toUpperCase().padLeft(4, '0');

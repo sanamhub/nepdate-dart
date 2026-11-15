@@ -83,8 +83,10 @@ final List<Named> _names = List<Named>.unmodifiable([
   for (var i = 0; i < kNamesNp.length; i++) Named._(kNamesNp[i], kNamesEn[i]),
 ]);
 
-/// The one [CalendarInfo] of each day with any data, built on first use.
-final Map<int, CalendarInfo> _cache = <int, CalendarInfo>{};
+/// The one [CalendarInfo] of each day in the coverage, built on first use. The slot of a day is
+/// its serial minus [kCoverageFirst], so a lookup is one list read.
+final List<CalendarInfo?> _cache =
+    List<CalendarInfo?>.filled(kCoverageLast - kCoverageFirst + 1, null);
 
 /// First index in [sorted] whose value is at least [value], or the length.
 int _lowerBound(List<int> sorted, int value) {
@@ -121,22 +123,26 @@ final List<int> _eventStart = () {
 CalendarInfo info(NepaliDate date) {
   final serial = NepaliDate.min.daysUntil(date);
   if (serial < kCoverageFirst || serial > kCoverageLast) return _empty;
-  return _cache.putIfAbsent(serial, () {
-    final tithiOffset = serial - kTithiFirst;
-    final tithi =
-        tithiOffset >= 0 && tithiOffset < kTithiIds.length ? _names[kTithiIds[tithiOffset]] : null;
-    final holiday = _contains(kHolidayDays, serial);
-    final eventIndex = _lowerBound(kEventDays, serial);
-    final hasEvents = eventIndex < kEventDays.length && kEventDays[eventIndex] == serial;
-    final events = hasEvents
-        ? List<Named>.unmodifiable([
-            for (var i = _eventStart[eventIndex]; i < _eventStart[eventIndex + 1]; i++)
-              _names[kEventNameIds[i]],
-          ])
-        : const <Named>[];
-    if (tithi == null && !holiday && events.isEmpty) return _empty;
-    return CalendarInfo._(tithi, holiday, events);
-  });
+  final slot = serial - kCoverageFirst;
+  return _cache[slot] ??= _build(serial);
+}
+
+/// Reads the tables for the day at [serial], which is inside the coverage.
+CalendarInfo _build(int serial) {
+  final tithiOffset = serial - kTithiFirst;
+  final tithi =
+      tithiOffset >= 0 && tithiOffset < kTithiIds.length ? _names[kTithiIds[tithiOffset]] : null;
+  final holiday = _contains(kHolidayDays, serial);
+  final eventIndex = _lowerBound(kEventDays, serial);
+  final hasEvents = eventIndex < kEventDays.length && kEventDays[eventIndex] == serial;
+  final events = hasEvents
+      ? List<Named>.unmodifiable([
+          for (var i = _eventStart[eventIndex]; i < _eventStart[eventIndex + 1]; i++)
+            _names[kEventNameIds[i]],
+        ])
+      : const <Named>[];
+  if (tithi == null && !holiday && events.isEmpty) return _empty;
+  return CalendarInfo._(tithi, holiday, events);
 }
 
 bool _contains(List<int> sorted, int value) {

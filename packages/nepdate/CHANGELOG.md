@@ -4,6 +4,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/). The two packages share one version. The repository
 changelog has the full history.
 
+## Unreleased
+
+### Changed
+
+- Faster conversion, formatting and parsing, with the same results for every date. Measured on the
+  reference machine, per operation: AD to BS 77 ns to 39 ns, the long Nepali date 567 ns to 158 ns,
+  strict parse 64 ns to 34 ns.
+  - `toDateTime` builds the `DateTime` from the day count, and `fromGregorian` reads the day count
+    of a UTC value directly. Neither goes through year, month and day fields.
+  - Formatting reads digit and year texts from tables and builds each result in one step.
+  - `parse` and `tryParse` read the text in one pass without allocating. `tryParse` no longer
+    builds an error it would throw away.
+
 ## 1.0.0-rc.1
 
 ### Changed
