@@ -1,0 +1,13 @@
+nepdate 3.13.7 on windows
+64 inputs, ns per operation, lower is better
+B1 51.55
+B2 38.50
+B3 10.42
+B4 8.62
+B5 154.65
+B6 33.66
+B7 3.66
+B8 291.19
+nepali_utils B1 23556.34
+nepali_utils B2 56007.51
+sink 107195375829
