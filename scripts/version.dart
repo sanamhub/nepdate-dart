@@ -1,4 +1,5 @@
-// Reads the one version of the two packages and checks that they agree.
+// Reads the one version of the two packages and checks that they agree, and that nepdate_patro
+// requires exactly that version of nepdate (ADR-0011).
 //
 //   dart run scripts/version.dart              print 0.2.0-rc.1
 //   dart run scripts/version.dart --line       print 0.2
@@ -20,10 +21,25 @@ String _versionOf(String path) {
   return match.group(1)!;
 }
 
+// The constraint the patro puts on nepdate under `dependencies:`, as written, or null.
+String? _coreRequirementOf(String path) {
+  final text = File(path).readAsStringSync();
+  final match = RegExp(
+    r'^dependencies:\n(?:  .*\n)*?  nepdate:[ \t]*(\S+)[ \t]*$',
+    multiLine: true,
+  ).firstMatch(text);
+  return match?.group(1);
+}
+
 void main(List<String> arguments) {
   final core = _versionOf('packages/nepdate/pubspec.yaml');
-  final patro = _versionOf('packages/nepdate_patro/pubspec.yaml');
+  const patroPath = 'packages/nepdate_patro/pubspec.yaml';
+  final patro = _versionOf(patroPath);
   if (core != patro) _fail('nepdate is $core but nepdate_patro is $patro');
+  final requirement = _coreRequirementOf(patroPath);
+  if (requirement != core) {
+    _fail('nepdate_patro requires nepdate $requirement, expected exactly $core');
+  }
 
   if (arguments.contains('--line')) {
     final parts = core.split('.');
