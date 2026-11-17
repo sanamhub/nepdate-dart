@@ -19,7 +19,7 @@ environment:
 resolution: workspace
 
 dependencies:
-  nepdate: ^1.0.0-rc.1
+  nepdate: 1.0.0-rc.1
 
 dev_dependencies:
   test: 1.33.0

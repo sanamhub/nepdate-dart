@@ -10,6 +10,7 @@ repository joins at `0.2.0-rc.1` with the other ports
 
 ### Changed
 
+- `nepdate_patro` requires exactly the same `nepdate` version (ADR-0011), not a caret range.
 - `nepdate`: faster conversion, formatting and parsing, with the same results for every date.
   Measured on the reference machine, per operation: AD to BS 77 ns to 39 ns, the long Nepali date
   567 ns to 158 ns, strict parse 64 ns to 34 ns. Conversion works on the day count without going

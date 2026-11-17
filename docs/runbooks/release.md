@@ -29,6 +29,7 @@ These are done once, before the first release. They need the repository and the 
 ## Cutting a release
 
 1. Bump the version in `packages/nepdate/pubspec.yaml` and `packages/nepdate_patro/pubspec.yaml`,
+   and the `nepdate:` constraint in the patro pubspec to the same version (ADR-0011),
    and move the `Unreleased` entries under `## 0.2.0-rc.1` in `CHANGELOG.md` and in both package
    changelogs. The two versions must be equal, and pub.dev reads the package changelog.
 2. Run the full gate locally: `dart run tool/ci.dart`.
