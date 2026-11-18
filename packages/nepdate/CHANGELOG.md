@@ -4,7 +4,7 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 [Semantic Versioning](https://semver.org/). The two packages share one version. The repository
 changelog has the full history.
 
-## Unreleased
+## 1.0.0
 
 ### Changed
 

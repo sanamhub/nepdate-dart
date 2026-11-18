@@ -6,7 +6,7 @@ All notable changes are listed here. The format follows
 repository joins at `0.2.0-rc.1` with the other ports
 ([hub ADR-0007](https://github.com/sanamhub/nepdate/blob/main/docs/adr/0007-one-version-line-for-every-sdk.md)).
 
-## Unreleased
+## 1.0.0
 
 ### Changed
 

@@ -37,8 +37,7 @@ as C# NepDate and the other ports, checked against the shared vectors.
 dart pub add nepdate
 ```
 
-In a Flutter app, use `flutter pub add nepdate`. While only the release candidate exists, pub picks
-it; pin `nepdate: 1.0.0-rc.1` in `pubspec.yaml` to stay on this one.
+In a Flutter app, use `flutter pub add nepdate`.
 
 ```dart
 import 'package:nepdate/nepdate.dart';
