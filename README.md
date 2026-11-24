@@ -264,7 +264,7 @@ calendar are projections inherited from C# NepDate.
 | Page | What it covers |
 |---|---|
 | [API](https://github.com/sanamhub/nepdate-dart/blob/main/docs/API.md) | Every public type and member, with an example |
-| [Benchmarks](https://github.com/sanamhub/nepdate-dart/blob/main/docs/benchmarks.md) | B1 to B8 against `nepali_utils` and C# NepDate |
+| [Benchmarks](https://github.com/sanamhub/nepdate-dart/blob/main/docs/benchmarks.md) | B1 to B8 against `nepali_utils` |
 | [Competitors](https://github.com/sanamhub/nepdate-dart/blob/main/docs/competitors.md) | The pub.dev packages considered for the benchmark |
 | [ADRs](https://github.com/sanamhub/nepdate-dart/blob/main/docs/adr/README.md) | Why the design is what it is |
 | [Release](https://github.com/sanamhub/nepdate-dart/blob/main/docs/runbooks/release.md) | Tagging, publishing and the post-publish check |
@@ -278,7 +278,7 @@ calendar are projections inherited from C# NepDate.
 ## Benchmarks
 
 `bench/` measures B1 to B8 of the shared benchmark specification against `nepali_utils`, the one
-pub.dev package that passes the competitor bar, and against the C# NepDate baseline. The machine,
+pub.dev package that passes the competitor bar. The machine,
 the method and the current numbers are in
 [docs/benchmarks.md](https://github.com/sanamhub/nepdate-dart/blob/main/docs/benchmarks.md).
 
