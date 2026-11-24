@@ -1,7 +1,7 @@
 # Benchmarks
 
 B1 to B8 of `shared/spec/BENCHMARK.md` on the machine and inputs the specification names, against
-`nepali_utils` 3.0.8 from pub.dev and the C# NepDate 2.1.0 baseline from the hub.
+`nepali_utils` 3.0.8 from pub.dev.
 
 The run is quiet: the machine was idle, the process was pinned to logical CPU 2 (affinity mask
 `0x4`) and the load was sampled before and during the run. This table replaces the earlier
@@ -18,7 +18,6 @@ preliminary one, which was taken on a shared machine without pinning.
 | Dart SDK | 3.13.7 stable, AOT executable from `dart compile exe` |
 | Harness | `benchmark_harness` 2.3.1, `warmup` and `exercise` overridden to time one pass over 64 inputs |
 | Competitor | `nepali_utils` 3.0.8 (the one package that passes the bar in [competitors.md](competitors.md)) |
-| C# column | .NET 10 column of the hub's `docs/benchmarks/dotnet.md`, same machine, BenchmarkDotNet |
 | Date of run | 2026-11-16 |
 | Affinity | logical CPU 2 (mask `0x4`), set with `start /affinity 4 /wait /b` |
 | Idle gate before the run | 6.7 percent average, 18.2 peak (30 one-second samples) |
@@ -50,30 +49,26 @@ measured and are not guessed.
 Time is nanoseconds per single operation. B8 is one whole month grid of 29 to 32 days. "Agrees" is
 how many of the 64 dates match `shared/data`.
 
-| ID | Operation | `nepdate` ns/op | bytes/op | `nepali_utils` ns/op | agrees | C# NepDate ns/op |
-|---|---|---:|---|---:|---|---:|
-| B1 | BS to AD | 51.55 | not measured | 23,556.34 | 61 of 64 | 5.60 |
-| B2 | AD to BS | 38.50 | not measured | 56,007.51 | 31 of 64 | 5.90 |
-| B3 | add 1000 days | 10.42 | not measured | not measured | | 2.79 |
-| B4 | add 13 months, Clamp | 8.62 | not measured | not measured | | 2.45 |
-| B5 | long format, Nepali, weekday | 154.65 | not measured | not measured | | 29.96 |
-| B6 | strict parse `YYYY/MM/DD` | 33.66 | not measured | not measured | | 7.28 |
-| B7 | patro info | 3.66 | not measured | not measured | | 16.46 |
-| B8 | patro month grid | 291.19 | not measured | not measured | | 633.13 |
+The comparison with C# NepDate, the original library, and the target check from `spec/BENCHMARK.md` section 6 are in the hub: [performance page](https://nepdate.com/docs/project/performance/).
+
+| ID | Operation | `nepdate` ns/op | bytes/op | `nepali_utils` ns/op | agrees |
+|---|---|---:|---|---:|---|
+| B1 | BS to AD | 51.55 | not measured | 23,556.34 | 61 of 64 |
+| B2 | AD to BS | 38.50 | not measured | 56,007.51 | 31 of 64 |
+| B3 | add 1000 days | 10.42 | not measured | not measured | |
+| B4 | add 13 months, Clamp | 8.62 | not measured | not measured | |
+| B5 | long format, Nepali, weekday | 154.65 | not measured | not measured | |
+| B6 | strict parse `YYYY/MM/DD` | 33.66 | not measured | not measured | |
+| B7 | patro info | 3.66 | not measured | not measured | |
+| B8 | patro month grid | 291.19 | not measured | not measured | |
 
 ## Reading the table
 
 - `nepali_utils` is about 460 times slower on B1 and 1,450 times slower on B2, and it disagrees with
   the shared data on 3 of 64 BS to AD dates and 33 of 64 AD to BS dates. A fast wrong answer is
   listed, never ranked first, so its two rows carry the agreement count and it is not ranked.
-- Against C# NepDate, Dart is 9.2 times slower on B1, 6.5 times slower on B2, 3.7 times slower on B3,
-  3.5 times slower on B4, 5.2 times slower on B5 and 4.6 times slower on B6. It is faster on B7 (0.22 times)
-  and B8 (0.46 times).
 - B1 and B2 call `toDateTime` and `fromGregorian`, which cross the `DateTime` boundary. A date that
   stays in BS (B3, B4) does not allocate a `DateTime`.
-- BENCHMARK section 6 gives Dart no fixed target: "C, Dart, PHP, Zig: no fixed target: the numbers
-  are reported beside C# NepDate and the selected competitors". The table is that report, with the
-  same operations and the same competitor, and no feature is dropped for a number.
 
 The competitor's usage and maturity evidence, including the 1,000 downloads in 30 days floor, is in
 [competitors.md](competitors.md). The decision is [ADR-0008](adr/0008-benchmarks-and-competitors.md).
