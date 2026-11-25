@@ -67,7 +67,20 @@ jobs:
         run: dart pub publish --dry-run
       - name: Publish dry run, patro
         working-directory: packages/nepdate_patro
-        run: dart pub publish --dry-run
+        # The exact core constraint (ADR-0011) is a pub warning on a stable version, and the dry
+        # run exits 65 on any warning. Accept that one warning alone; anything else still fails.
+        run: |
+          set -euo pipefail
+          code=0
+          out="$(dart pub publish --dry-run 2>&1)" || code=$?
+          printf '%s\n' "$out"
+          if [ "$code" -eq 65 ] &&
+            grep -qx 'Package has 1 warning\.' <<<"$out" &&
+            grep -qF 'Your dependency on "nepdate" should allow more than one version' <<<"$out"; then
+            echo "Only the exact core constraint warning from ADR-0011, accepted."
+            exit 0
+          fi
+          exit "$code"
       - name: Build the release archives
         env:
           VERSION: ${{ steps.version.outputs.version }}
